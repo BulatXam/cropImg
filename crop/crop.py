@@ -1,22 +1,29 @@
 def crop_image_by_proportions(image, width_p=3, height_p=4):
-    if image.width < image.height:
-        width = image.width
-        height = image.width
-    else:
-        width = image.height
-        height = image.height
+    width_sqr = height_sqr = min(image.width, image.height)
 
-    common_percent = 100 / height_p + width_p
+    max_proportion = max(width_p, height_p)
+    min_proportion = min(width_p, height_p)
 
-    width_percent = width / 100 * (common_percent * width_p)
-    width_percent1 = (width - width_percent) / 2
-    width_percent2 = width - width_percent1
+    size_proportion = (width_sqr / max_proportion) * min_proportion
 
-    height_percent = height / 100 * (common_percent * height_p)
-    height_percent1 = (height - height_percent) / 2
-    height_percent2 = height - height_percent1
+    # Точка начала выреза ширины с середины
+    width_center1 = (image.width - size_proportion) / 2
+    # Точка конца выреза ширины с середины
+    width_center2 = image.width - width_center1
 
-    crop_coordinates = \
-        (width_percent1, height_percent1, width_percent2, height_percent2)
-    image = image.crop(crop_coordinates)
+    # Точка начала выреза высоты с середины
+    height_center1 = (image.height - height_sqr) / 2
+    # Точка конца выреза высоты с середины
+    height_center2 = image.height - height_center1
+
+    # В итоге получается прямоугольный четырехугольник,
+    # который находится в центре картинки
+
+    crop_coordinate = \
+        (width_center1, height_center1, width_center2, height_center2)
+
+    image = image.crop(
+        crop_coordinate
+    )
+
     return image
